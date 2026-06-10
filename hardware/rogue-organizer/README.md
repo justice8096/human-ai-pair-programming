@@ -26,10 +26,20 @@ Everything is one parametric OpenSCAD file: `rogue-organizer.scad`.
 |------|------|----------------|-------|
 | Drive box (4 bays) | `stl/drive_box.stl` | 162 × 195 × 125 | vented, dovetail groove on one side |
 | Drive lid | `stl/drive_lid.stl` | 153 × 195 × 11 | friction-fit, vented, finger notch |
+| Drive lid + fan | `stl/drive_lid_fan.stl` | 153 × 195 × 11 | active-cooling variant: 80/92 mm fan bore + printed guard + M4 holes |
 | Mini-PC cradle | `stl/minipc_cradle.stl` | 141 × 122 × 29 | vented floor on standoffs, dovetail tongue |
 | USB hub tray | `stl/hub_tray.stl` | 109 × 64 × 19 | keyhole wall mount |
+| Power-brick caddy | `stl/brick_caddy.stl` | 183 × 124 × 45 | 5 vertical slots, vented, rear cable slots + zip-tie anchors |
 | Cable spine | `stl/cable_spine.stl` | 200 × 8 × 28 | comb + zip-tie slots + screw ears |
 | Cable clip | `stl/cable_clip.stl` | 16 × 14 × 12 | print several |
+
+Print **either** `drive_lid` (passive) **or** `drive_lid_fan` (active) — not both.
+
+### Drawing
+
+`img/drawing.png` is a dimensioned top-view spec (regenerate with
+`part="drawing"`, orthographic top camera). Box + cradle sit side-by-side
+(~294 mm wide × 195 mm deep); the hub and brick caddy mount wherever convenient.
 
 All parts are manifold single bodies and fit a **220 × 220 mm** bed.
 (The drive box is 195 mm deep, so it will **not** fit a 180 mm bed such as a
@@ -41,9 +51,12 @@ The model is driven entirely by variables at the top of the `.scad`. Edit and
 re-export — no CAD skills needed.
 
 ```scad
-orico   = [186, 118, 31.4];  // your enclosure L x W x T  (measured)
-beelink = [126, 113, 42];    // mini PC W x D x H          (spec sheet)
-hub     = [100, 45, 15];     // USB hub W x D x H          (ASSUMED - measure!)
+orico       = [186, 118, 31.4];  // your enclosure L x W x T  (measured)
+beelink     = [126, 113, 42];    // mini PC W x D x H          (spec sheet)
+hub         = [100, 45, 15];     // USB hub W x D x H          (ASSUMED - measure!)
+fan_size    = 80;                // 80 or 92 mm (drive_lid_fan); set fan_screw to match
+brick       = [115, 50, 30];     // power-brick L x W x T      (ASSUMED - measure!)
+brick_count = 5;                 // how many brick slots in the caddy
 ```
 
 Fit tuning (loosen/tighten for your printer):
@@ -100,16 +113,17 @@ Valid `part` values: `layout` (preview-only), `drive_box`, `drive_lid`,
 
 In the spirit of this repo, here are the design's honest counter-arguments:
 
-1. **Heat is the real risk.** Four 3.5" HDDs plus a Ryzen 9 6900HX in/near a
-   closed box generate meaningful heat. The passive louvers + floor vents help,
-   but a sealed lid can still trap warm air. **Mitigations:** run the box with
-   the lid off, keep the mini PC cradle (open-top) physically separate from the
-   box, or add an active fan. A fan mount (80/92 mm) is **not yet a part** — easy
-   to add if you want forced airflow.
-2. **No dedicated power-brick / PSU bay yet.** The spine + zip-tie anchors route
-   and bundle cables, but the 5–6 wall-warts (4 enclosures + Beelink + hub) are
-   currently just bundled, not boxed. A rear brick caddy / power-strip holster
-   is a natural next part once brick counts and sizes are confirmed.
+1. **Heat is still the main risk.** Four 3.5" HDDs plus a Ryzen 9 6900HX in/near
+   a closed box generate meaningful heat. Mitigations now built in: passive
+   louvers + floor vents, an open-top cradle, and the **`drive_lid_fan`**
+   active-cooling lid (80/92 mm fan). For a spinning-rust NAS, running the fan
+   as a gentle **exhaust** (pulling air up and out the lid) is recommended. Power
+   it from a USB or 12 V header — a fan controller/header is out of scope here.
+2. **Brick caddy holds 5 slots; sizes are assumed.** `brick_caddy` organizes the
+   wall-warts in vertical slots, but `brick = [115,50,30]` and `brick_count = 5`
+   are placeholders — measure your bricks and adjust. Very large or oddly shaped
+   bricks may need a wider slot or fewer slots. The power *strip* itself is not
+   enclosed (most are too long); route its cable through the spine.
 3. **Bed size assumed 220 mm.** The drive box (195 mm deep) won't fit smaller
    beds; it would need splitting into front/back halves for a 180 mm printer.
 4. **Joint clearances are printer-dependent.** `lid_gap` and `dt_cl` are first

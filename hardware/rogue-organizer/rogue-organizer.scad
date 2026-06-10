@@ -55,6 +55,15 @@ dt_neck = 6;     // width at the wall (narrow neck)
 dt_tip  = 11;    // width at the tip (wide -> locks)
 dt_cl   = 0.4;   // dovetail clearance (groove is this much bigger)
 
+// active-cooling fan option (mounts on the drive-box lid)
+fan_size  = 80;      // 80 or 92 (mm)
+fan_screw = 71.5;    // screw spacing: 80mm->71.5, 92mm->82.5, 120mm->105
+fan_bore  = fan_size - 6;
+
+// power bricks  --  >>> MEASURE YOURS <<< (placeholders for typical units): L x W x T
+brick       = [115, 50, 30];   // largest ~100W barrel brick (Beelink); others smaller
+brick_count = 5;               // how many bricks to slot
+
 eps = 0.02;
 $fn = 40;
 
@@ -353,6 +362,131 @@ module layout(){
 }
 
 // =============================================================================
+//  PART: DRIVE LID WITH FAN  (active-cooling variant of the lid)
+// =============================================================================
+module lid_skirt(){
+    translate([0,0,-lid_lip])
+        difference(){
+            rbox([in_w - 2*lid_gap, in_d - 2*lid_gap, lid_lip+eps], r=2);
+            translate([0,0,-eps])
+                rbox([in_w-2*lid_gap-4, in_d-2*lid_gap-4, lid_lip+1], r=2);
+        }
+}
+module drive_lid_fan(){
+    top_t = 3;
+    difference(){
+        union(){ rbox([ext_w, ext_d, top_t], r=3); lid_skirt(); }
+        // fan bore
+        translate([0,0,top_t/2]) cylinder(h=top_t+2, d=fan_bore, center=true);
+        // fan screw holes (M4 clearance)
+        for (sx=[-1,1], sy=[-1,1])
+            translate([sx*fan_screw/2, sy*fan_screw/2, top_t/2])
+                cylinder(h=top_t+2, d=4.3, center=true);
+        // perimeter vent holes everywhere EXCEPT under the fan footprint
+        difference(){
+            translate([0,0,top_t/2]) vent_holes(in_w, in_d, top_t, d=6, gap=7, margin=8);
+            translate([0,0,top_t/2]) cylinder(h=top_t+4, d=fan_size+10, center=true);
+        }
+        // finger notch
+        translate([0, ext_d/2, top_t/2]) cube([24, 10, top_t+2], center=true);
+    }
+    // printed finger guard across the bore
+    intersection(){
+        cylinder(h=3, d=fan_bore+1);
+        union() for (a=[0:45:179])
+            rotate([0,0,a]) translate([0,0,1.5]) cube([fan_bore+2, 2.5, 3], center=true);
+    }
+}
+
+// =============================================================================
+//  PART: POWER-BRICK CADDY  (vertical slots for wall-warts; tidies the bricks)
+// =============================================================================
+module brick_caddy(){
+    bslot = brick[2] + 2*clear;                       // slot width (brick thickness)
+    bin_w = brick_count*bslot + (brick_count-1)*div;  // internal width
+    bin_d = brick[0] + 2*clear;                        // depth (brick length)
+    bin_h = brick[1] - 8;                              // wall height (< brick, easy to grab)
+    bext_w = bin_w + 2*wall;
+    bext_d = bin_d + 2*wall;
+    bext_h = floor_t + bin_h;
+
+    difference(){
+        rbox([bext_w, bext_d, bext_h], r=3);
+        translate([0,0,floor_t]) rbox([bin_w, bin_d, bin_h+eps], r=2);
+        // floor vents (bricks get warm)
+        translate([0,0,floor_t/2]) vent_holes(bin_w, bin_d, floor_t, d=8, gap=8);
+        // rear cable slot per bay
+        for (i=[0:brick_count-1]){
+            x = -bin_w/2 + bslot/2 + i*(bslot+div);
+            translate([x, -bext_d/2, floor_t + bin_h*0.5])
+                cube([bslot*0.6, wall+2*eps+2, bin_h], center=true);
+        }
+        // zip-tie anchors along the rear
+        for (s=[-1,1]) translate([s*bin_w/4, -bext_d/2, bext_h-10]) ziptie_pair();
+    }
+    // dividers between bricks
+    for (i=[1:brick_count-1]){
+        x = -bin_w/2 + i*bslot + (i-1)*div + div/2;
+        translate([x - div/2, -bin_d/2, floor_t]) cube([div, bin_d, bin_h-4]);
+    }
+}
+
+// =============================================================================
+//  DIMENSIONED DRAWING  (top-view spec drawing; render orthographic top)
+// =============================================================================
+line_w = 1.4;
+module htick(x,y,h=5){ translate([x-line_w/2,y-h/2,0.2]) cube([line_w,h,1]); }
+module vtick(x,y,w=5){ translate([x-w/2,y-line_w/2,0.2]) cube([w,line_w,1]); }
+module hdim(x1,x2,y,txt){
+    color([0.1,0.1,0.1]){
+        translate([min(x1,x2),y-line_w/2,0.2]) cube([abs(x2-x1),line_w,1]);
+        htick(x1,y); htick(x2,y);
+        translate([(x1+x2)/2, y+7, 0.2]) linear_extrude(1)
+            text(txt, size=8, halign="center", valign="center");
+    }
+}
+module vdim(y1,y2,x,txt){
+    color([0.1,0.1,0.1]){
+        translate([x-line_w/2,min(y1,y2),0.2]) cube([line_w,abs(y2-y1),1]);
+        vtick(x,y1); vtick(x,y2);
+        translate([x-8,(y1+y2)/2,0.2]) rotate([0,0,90]) linear_extrude(1)
+            text(txt, size=8, halign="center", valign="center");
+    }
+}
+module drawing(){
+    // footprints (flat outlines) of the assembled parts
+    color([0.62,0.74,0.86]) translate([0,0,0]) rbox([ext_w, ext_d, 0.4], r=3);
+    color([0.74,0.84,0.70]) translate([cradle_cx,0,0])
+        rbox([beelink[0]+2*clear+2*wall, beelink[1]+2*clear+2*wall, 0.4], r=3);
+    cr_r = cradle_cx + (beelink[0]+2*clear+2*wall)/2;
+    hubW = hub[0]+2*clear+2*wall;  hubD = hub[1]+2*clear+2*wall;
+    dhub_x = cr_r + 30 + hubW/2;   // hub drawn to the RIGHT of the cradle (clear of dims)
+    color([0.95,0.78,0.45]) translate([dhub_x,0,0]) rbox([hubW, hubD, 0.4], r=2);
+    color([0.95,0.6,0.55]) translate([0,-ext_d/2-30,0]) cube([spine_len,spine_t,0.4],center=true);
+
+    // overall + component dimensions
+    // (overall = box+cradle row only; the hub mounts separately, drawn aside)
+    hdim(-ext_w/2, cr_r, -ext_d/2-55, str("box + cradle width  ", round(cr_r+ext_w/2), " mm"));
+    color([0.45,0.45,0.45]) translate([dhub_x, -hubD/2-10, 0.2]) linear_extrude(1)
+        text("(mounts separately)", size=6, halign="center", valign="center");
+    hdim(-ext_w/2,  ext_w/2, ext_d/2+30, str("box  ", round(ext_w), " mm"));
+    vdim(-ext_d/2, ext_d/2, -ext_w/2-22, str("box depth  ", round(ext_d), " mm"));
+    hdim(cradle_cx-(beelink[0]+2*clear+2*wall)/2, cr_r, ext_d/2+30,
+         str("cradle  ", round(beelink[0]+2*clear+2*wall), " mm"));
+    // labels
+    color([0.1,0.1,0.1]){
+        translate([0, ext_d/2+58,0.2]) linear_extrude(1)
+            text("rogue-organizer  -  top view (assembled footprint)", size=10, halign="center");
+        translate([0, 0, 0.5]) linear_extrude(1)
+            text("4x ORICO 3.5\"", size=10, halign="center", valign="center");
+        translate([cradle_cx, 0, 0.5]) linear_extrude(1)
+            text("BEELINK", size=9, halign="center", valign="center");
+        translate([dhub_x, 0, 0.5]) linear_extrude(1)
+            text("HUB", size=8, halign="center", valign="center");
+    }
+}
+
+// =============================================================================
 //  MOCKUP  --  assembled organizer populated with translucent hardware ghosts
 //             (PREVIEW ONLY). show_lid toggles the box lid.
 // =============================================================================
@@ -401,6 +535,9 @@ module mockup(show_lid=true){
 
 if      (part == "mockup")        mockup(true);
 else if (part == "mockup_open")   mockup(false);
+else if (part == "drawing")       drawing();
+else if (part == "drive_lid_fan") drive_lid_fan();
+else if (part == "brick_caddy")   brick_caddy();
 else if (part == "layout")        layout();
 else if (part == "drive_box")     drive_box();
 else if (part == "drive_lid")     drive_lid();
