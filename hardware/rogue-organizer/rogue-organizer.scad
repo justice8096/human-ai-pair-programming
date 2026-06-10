@@ -352,7 +352,56 @@ module layout(){
         translate([0, -ext_d/2 - 80, 0]) cable_spine();
 }
 
-if      (part == "layout")        layout();
+// =============================================================================
+//  MOCKUP  --  assembled organizer populated with translucent hardware ghosts
+//             (PREVIEW ONLY). show_lid toggles the box lid.
+// =============================================================================
+cext_w = beelink[0] + 2*clear + 2*wall;
+cradle_cx = ext_w/2 + dt_p + cext_w/2;   // cradle mated to box +X side
+
+module ghost(sz, c){ color(c) cube(sz, center=true); }
+
+// flat ground-plane text label
+module label(txt, x, y, size=9, c=[0.15,0.15,0.15]){
+    color(c) translate([x, y, 0.2]) linear_extrude(1)
+        text(txt, size=size, halign="center", valign="center");
+}
+
+hub_cx = cradle_cx;
+hub_cy = ext_d/2 + 45;        // hub tray sits on the desk in front of the cradle
+
+module mockup(show_lid=true){
+    // --- printed parts ---
+    color("SteelBlue")    drive_box();
+    color("DarkSeaGreen") translate([cradle_cx, 0, 0]) minipc_cradle();
+    color("Salmon")       translate([0, -ext_d/2 - 30, 0]) cable_spine();
+    color("Goldenrod")    translate([hub_cx, hub_cy, 0]) hub_tray();
+    if (show_lid) color([0.85,0.85,0.85,0.92]) translate([0,0,ext_h]) drive_lid();
+
+    // --- hardware (opaque, so it actually reads) ---
+    // 4 Orico enclosures standing in their bays
+    for (i=[0:orico_count-1]){
+        x = -in_w/2 + slot_w/2 + i*(slot_w+div);
+        translate([x, 0, floor_t + orico[1]/2])
+            ghost([orico[2], orico[0], orico[1]], [0.22,0.22,0.26]);
+    }
+    // Beelink SER6 Pro in its cradle
+    translate([cradle_cx, 0, floor_t+foot_h + beelink[2]/2])
+        ghost([beelink[0], beelink[1], beelink[2]], [0.12,0.12,0.14]);
+    // USB hub in its tray
+    translate([hub_cx, hub_cy, floor_t + hub[2]/2])
+        ghost([hub[0], hub[1], hub[2]], [0.10,0.10,0.55]);
+
+    // --- annotations ---
+    label("4x ORICO 3.5\" (vertical, lid removed)", 0, ext_d/2 + 18, 10);
+    label("BEELINK SER6 PRO", cradle_cx, -ext_d/2 - 6, 10);
+    label("USB HUB", hub_cx, hub_cy + 42, 9);
+    label("CABLE SPINE", 0, -ext_d/2 - 52, 9, [0.6,0.2,0.2]);
+}
+
+if      (part == "mockup")        mockup(true);
+else if (part == "mockup_open")   mockup(false);
+else if (part == "layout")        layout();
 else if (part == "drive_box")     drive_box();
 else if (part == "drive_lid")     drive_lid();
 else if (part == "minipc_cradle") minipc_cradle();
