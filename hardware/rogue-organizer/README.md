@@ -50,6 +50,12 @@ A space-saving alternative to the side-by-side layout: the mini PC stacks
 
 Render the stack with `part="ac_tower"` (assembled) or `"ac_tower_x"` (exploded).
 
+**Integration:** the drive section has a rear **hook peg** that the USB hub
+tray's keyhole hangs on, so the hub mounts directly to the tower. The power-brick
+caddy stays desk-sited beside/behind the tower (an open-top tray can't hang
+vertically without the bricks sliding out) and is tied into the run by the cable
+spine. Render the whole assembly with `part="full_system"`.
+
 **Cooling:** the mid-deck fan pulls hot air **up** out of the drive bays and the
 corner standoffs hold the PC cradle ~16 mm above the deck, so that air vents
 **sideways out the reveal gap** between the two sections instead of dumping onto

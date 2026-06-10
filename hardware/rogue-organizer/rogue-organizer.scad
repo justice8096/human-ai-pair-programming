@@ -657,6 +657,14 @@ module cloud_rail(w, base_h, step_h, depth){
     rotate([90,0,0]) linear_extrude(depth, center=true) cloud_profile(w, base_h, step_h);
 }
 
+// coat-hook style mount peg (protrudes -Y) that an accessory keyhole hangs on
+module mount_peg(){
+    rotate([90,0,0]){
+        cylinder(h=8, d=4.8);                       // shaft
+        translate([0,0,8]) cylinder(h=3, d=9);      // retaining head
+    }
+}
+
 // ---- DRIVE SECTION ---------------------------------------------------------
 module ac_drive(){
     color(acAC){
@@ -679,6 +687,8 @@ module ac_drive(){
             translate([x - div/2, -in_d/2, floor_t]) cube([div, in_d, ac_inh-12]);
         }
         corner_tenons(ac_w, ac_d, [ac_lowh*0.20, ac_lowh*0.82]);
+        // rear hook peg for the USB hub tray (its keyhole hangs on this)
+        translate([0, -ac_d/2 + eps, ac_lowh*0.74]) mount_peg();
     }
 }
 
@@ -759,6 +769,26 @@ module ac_tower(exploded=0){
     translate([0,0,z_deck   + e*1.0]) ac_deck();
     translate([0,0,z_cradle + e*1.7]) ac_cradle();
     translate([0,0,z_cap    + e*2.6]) ac_cap();
+}
+
+// ---- FULL INTEGRATED SYSTEM (render) ---------------------------------------
+module full_system(){
+    ac_tower(0);
+    // USB hub tray hung on the tower's rear hook peg (keyhole faces the tower)
+    color("Goldenrod")
+        translate([0, -ac_d/2 - 6, ac_lowh*0.74 + 10]) rotate([0,0,180]) hub_tray();
+    // power-brick caddy on the desk behind the tower
+    color("SteelBlue")
+        translate([0, -ac_d/2 - 95, 0]) brick_caddy();
+    // cable spine bridging tower rear to the caddy
+    color("Salmon")
+        translate([0, -ac_d/2 - 45, 0]) cable_spine();
+    // ghosts: bricks in the caddy + hub in its tray (so the system reads)
+    bs = brick[2]+2*clear; bw = brick_count*bs+(brick_count-1)*div;
+    for(i=[0:brick_count-1]) translate([-bw/2+bs/2+i*(bs+div), -ac_d/2-95, floor_t+brick[1]/2-4])
+        color([0.15,0.15,0.18]) cube([brick[2], brick[0], brick[1]-8], center=true);
+    color([0.10,0.10,0.55]) translate([0, -ac_d/2 - 6, ac_lowh*0.74 + 10 + floor_t + hub[2]/2])
+        cube([hub[0], hub[1], hub[2]], center=true);
 }
 
 // ---- PRINT PLATES (each part flat on its own 220x220 bed) ------------------
@@ -845,6 +875,7 @@ else if (part == "ac_cap")        ac_cap();
 else if (part == "ac_tower")      ac_tower(0);
 else if (part == "ac_tower_x")    ac_tower(40);
 else if (part == "print_plates")  print_plates();
+else if (part == "full_system")   full_system();
 else if (part == "drive_lid_fan") drive_lid_fan();
 else if (part == "brick_caddy")   brick_caddy();
 else if (part == "layout")        layout();
