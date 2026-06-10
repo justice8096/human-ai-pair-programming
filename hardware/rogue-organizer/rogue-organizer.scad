@@ -614,6 +614,154 @@ module tower_artscraft(){
 }
 
 // =============================================================================
+//  ARTS & CRAFTS PRINT-READY STACKED TOWER
+//  Stack:  drive section -> fan mid-deck (exhaust plenum) -> PC cradle -> cap
+//  Mid-deck fan pulls drive-bay heat UP and vents it OUT the reveal gap before
+//  it reaches the mini PC. All parts are manifold and print support-free.
+// =============================================================================
+ac_w    = ext_w;                    // drive-section outer width
+ac_d    = ext_d;                    // drive-section outer depth
+ac_inh  = orico[1] + clear + 9;     // internal drive height (extra top margin)
+ac_lowh = floor_t + ac_inh;         // drive-section height
+deck_t   = 4;                       // mid-deck plate thickness
+deck_lip = 6;                       // deck spigot depth into the box opening
+plenum   = 16;                      // exhaust gap (also the aesthetic reveal)
+cr_w     = beelink[0] + 2*clear + 2*wall;   // PC cradle width
+cr_d     = beelink[1] + 2*clear + 2*wall;   // PC cradle depth
+cr_wallz = 26;                      // PC cradle wall height
+cr_h     = floor_t + cr_wallz;
+acAC = [0.52,0.35,0.17];            // Craftsman oak (light)
+acDK = [0.44,0.29,0.13];            // Craftsman oak (dark, caps/plinth)
+
+// Mission-style pierced panel cut on a +Y face at y=face_y, centred at zc
+module mission_pierce(face_y, zc, slotH=42, span=26, depth=20){
+    for (x=[-span,0,span]){
+        translate([x, face_y, zc]) rotate([90,0,0]) linear_extrude(depth,center=true)
+            offset(2.5) offset(-2.5) square([7, slotH], center=true);
+        translate([x, face_y, zc + slotH/2 + 11]) rotate([90,0,0])
+            linear_extrude(depth,center=true) square([10,10], center=true);
+    }
+}
+// exposed square through-tenon pegs at the four vertical corners
+module corner_tenons(w, d, zlist){
+    for (sx=[-1,1], sy=[-1,1], z=zlist)
+        translate([sx*w/2, sy*d/2, z]) cube([6,6,14], center=true);
+}
+// Greene & Greene "cloud lift" front rail: stepped-top bar, length w, extruded in Y
+module cloud_profile(w, base_h, step_h){
+    s = w*0.22;
+    polygon([[-w/2,0],[-w/2,base_h],[-s,base_h],[-s,base_h+step_h],
+             [ s,base_h+step_h],[ s,base_h],[ w/2,base_h],[w/2,0]]);
+}
+module cloud_rail(w, base_h, step_h, depth){
+    rotate([90,0,0]) linear_extrude(depth, center=true) cloud_profile(w, base_h, step_h);
+}
+
+// ---- DRIVE SECTION ---------------------------------------------------------
+module ac_drive(){
+    color(acAC){
+        difference(){
+            rbox([ac_w, ac_d, ac_lowh], r=3);
+            translate([0,0,floor_t]) rbox([in_w, in_d, ac_lowh], r=2);   // open-top cavity
+            mission_pierce(ac_d/2, ac_lowh*0.40);                         // front panel
+            vents_X(+ac_w/2, ac_d, floor_t+12, ac_lowh-12, bar=6, gap=12); // side louvers
+            vents_X(-ac_w/2, ac_d, floor_t+12, ac_lowh-12, bar=6, gap=12);
+            for (i=[0:orico_count-1]){                                    // rear cable slots
+                x = -in_w/2 + slot_w/2 + i*(slot_w+div);
+                translate([x, -ac_d/2, floor_t + ac_inh*0.5])
+                    cube([slot_w*0.7, wall+2*eps+2, ac_inh*0.55], center=true);
+            }
+            translate([0,0,floor_t/2]) vent_holes(in_w, in_d, floor_t, d=7, gap=8); // floor vents
+        }
+        // bay dividers (kept clear of the deck spigot)
+        for (i=[1:orico_count-1]){
+            x = -in_w/2 + i*slot_w + (i-1)*div + div/2;
+            translate([x - div/2, -in_d/2, floor_t]) cube([div, in_d, ac_inh-12]);
+        }
+        corner_tenons(ac_w, ac_d, [ac_lowh*0.20, ac_lowh*0.82]);
+    }
+}
+
+// ---- FAN MID-DECK (exhaust plenum) -----------------------------------------
+module ac_deck(){
+    color(acDK){
+        difference(){
+            union(){
+                rbox([ac_w, ac_d, deck_t], r=3);                          // flange
+                translate([0,0,-deck_lip])
+                    rbox([in_w-1, in_d-1, deck_lip+eps], r=2);            // spigot into box
+            }
+            translate([0,0,-deck_lip-1]) cylinder(h=deck_t+deck_lip+2, d=fan_bore); // fan bore
+            for (sx=[-1,1], sy=[-1,1])                                    // fan screws
+                translate([sx*fan_screw/2, sy*fan_screw/2, 0])
+                    cylinder(h=deck_t+deck_lip+2, d=4.3, center=true);
+        }
+        // fan finger-guard spokes across the bore (on top)
+        intersection(){
+            translate([0,0,deck_t-2]) cylinder(h=2.5, d=fan_bore+1);
+            union() for (a=[0:45:179]) rotate([0,0,a])
+                translate([0,0,deck_t-0.75]) cube([fan_bore+2, 2.5, 2.5], center=true);
+        }
+        // corner standoffs (create the plenum gap) with register pegs for the cradle
+        for (sx=[-1,1], sy=[-1,1])
+            translate([sx*(cr_w/2-12), sy*(cr_d/2-12), deck_t]){
+                cylinder(h=plenum, d=12);
+                translate([0,0,plenum]) cylinder(h=6, d=5.8);
+            }
+    }
+}
+
+// ---- PC CRADLE -------------------------------------------------------------
+module ac_cradle(){
+    color(acAC){
+        difference(){
+            rbox([cr_w, cr_d, cr_h], r=3);
+            translate([0,0,floor_t]) rbox([cr_w-2*wall, cr_d-2*wall, cr_wallz+eps], r=2);
+            translate([0,0,floor_t/2])
+                vent_holes(cr_w-2*wall, cr_d-2*wall, floor_t, d=10, gap=8, margin=8); // floor vents
+            mission_pierce(cr_d/2, floor_t + cr_wallz*0.45, slotH=14, span=20);        // front panel
+            translate([0,-cr_d/2, floor_t+cr_wallz/2])
+                cube([cr_w*0.5, wall+2*eps+2, cr_wallz], center=true);                 // rear cable slot
+            for (sx=[-1,1], sy=[-1,1])                                                 // register holes
+                translate([sx*(cr_w/2-12), sy*(cr_d/2-12), -1]) cylinder(h=floor_t+2, d=6.2);
+            for (s=[-1,1])                                                             // grip cutouts
+                translate([s*cr_w/2, cr_d/2, cr_h-1]) cube([16,16,cr_wallz], center=true);
+        }
+        corner_tenons(cr_w, cr_d, [cr_h*0.5]);
+    }
+}
+
+// ---- CLOUD-LIFT CAP --------------------------------------------------------
+module ac_cap(){
+    color(acDK){
+        difference(){
+            union(){
+                rbox([cr_w+14, cr_d+14, 7], r=4);                         // overhanging top
+                translate([0,0,-8])                                       // friction skirt down
+                    difference(){
+                        rbox([cr_w-2*wall-0.8, cr_d-2*wall-0.8, 8+eps], r=2);
+                        translate([0,0,-eps]) rbox([cr_w-2*wall-5, cr_d-2*wall-5, 9], r=2);
+                    }
+            }
+            translate([0,0,3.5]) vent_holes(cr_w-12, cr_d-12, 7, d=7, gap=8, margin=12);
+        }
+        translate([0, (cr_d+14)/2 - 5, 7]) cloud_rail(cr_w*0.8, 6, 7, 9);   // cloud-lift rail
+    }
+}
+
+// ---- ASSEMBLY (render) -----------------------------------------------------
+z_deck   = ac_lowh;
+z_cradle = ac_lowh + deck_t + plenum;
+z_cap    = z_cradle + cr_h;
+module ac_tower(exploded=0){
+    e = exploded;
+    ac_drive();
+    translate([0,0,z_deck   + e*1.0]) ac_deck();
+    translate([0,0,z_cradle + e*1.7]) ac_cradle();
+    translate([0,0,z_cap    + e*2.6]) ac_cap();
+}
+
+// =============================================================================
 //  MOCKUP  --  assembled organizer populated with translucent hardware ghosts
 //             (PREVIEW ONLY). show_lid toggles the box lid.
 // =============================================================================
@@ -665,6 +813,12 @@ else if (part == "mockup_open")   mockup(false);
 else if (part == "drawing")       drawing();
 else if (part == "tower_steampunk") tower_steampunk();
 else if (part == "tower_artscraft") tower_artscraft();
+else if (part == "ac_drive")      ac_drive();
+else if (part == "ac_deck")       ac_deck();
+else if (part == "ac_cradle")     ac_cradle();
+else if (part == "ac_cap")        ac_cap();
+else if (part == "ac_tower")      ac_tower(0);
+else if (part == "ac_tower_x")    ac_tower(40);
 else if (part == "drive_lid_fan") drive_lid_fan();
 else if (part == "brick_caddy")   brick_caddy();
 else if (part == "layout")        layout();

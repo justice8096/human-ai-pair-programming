@@ -35,6 +35,28 @@ Everything is one parametric OpenSCAD file: `rogue-organizer.scad`.
 
 Print **either** `drive_lid` (passive) **or** `drive_lid_fan` (active) — not both.
 
+### Arts & Crafts stacked tower (print-ready)
+
+A space-saving alternative to the side-by-side layout: the mini PC stacks
+**on top** of the drive box, in a Craftsman/Mission aesthetic. Footprint drops to
+~159 × 201 mm; total height ~190 mm. Four parts, all manifold + support-free:
+
+| Part | File | Footprint (mm) | Notes |
+|------|------|----------------|-------|
+| Drive section | `stl/ac_drive.stl` | 159 × 201 × 132 | 4 bays, pierced front, side louvers, corner tenons |
+| Fan mid-deck | `stl/ac_deck.stl` | 153 × 195 × 32 | 80/92 mm fan + spoke guard; standoffs form the exhaust plenum |
+| PC cradle | `stl/ac_cradle.stl` | 141 × 128 × 29 | vented floor, register holes, pierced front |
+| Cloud-lift cap | `stl/ac_cap.stl` | 149 × 136 × 28 | overhanging top, vented, friction skirt |
+
+Render the stack with `part="ac_tower"` (assembled) or `"ac_tower_x"` (exploded).
+
+**Cooling:** the mid-deck fan pulls hot air **up** out of the drive bays and the
+corner standoffs hold the PC cradle ~16 mm above the deck, so that air vents
+**sideways out the reveal gap** between the two sections instead of dumping onto
+the mini PC. The cradle floor is also vented for some upward flow. Run the fan as
+an **exhaust** (blowing up). Assembly order: drive section → drop the deck spigot
+in → press the cradle onto the deck's register pegs → friction-fit the cap.
+
 ### Drawing
 
 `img/drawing.png` is a dimensioned top-view spec (regenerate with
@@ -122,10 +144,9 @@ Two aesthetic concepts are included as renders (`part="tower_steampunk"` /
   pierced rectilinear vents, exposed square through-tenon corner pegs, an
   overhanging cloud-lift top cap, and a plinth base with block feet.
 
-These are **visual concepts, not yet final printable parts** — the decorative
-geometry renders but hasn't been re-engineered into vented, manifold, joint-ready
-modules. Pick a direction and it gets refined into print-ready parts (and the
-heat/joint considerations below still apply, more so when stacked).
+The **steampunk** concept (brass, rivets, pipe fittings) is still a render-only
+concept. The **Arts & Crafts** direction has since been developed into real
+print-ready parts with a mid-deck fan — see *Arts & Crafts stacked tower* above.
 
 ## Cross-vet — known weak points
 
