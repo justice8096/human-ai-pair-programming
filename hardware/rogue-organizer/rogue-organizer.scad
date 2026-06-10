@@ -689,6 +689,31 @@ module ac_drive(){
         corner_tenons(ac_w, ac_d, [ac_lowh*0.20, ac_lowh*0.82]);
         // rear hook peg for the USB hub tray (its keyhole hangs on this)
         translate([0, -ac_d/2 + eps, ac_lowh*0.74]) mount_peg();
+        // low rear hook peg for the caddy link bracket
+        translate([0, -ac_d/2 + eps, link_z]) mount_peg();
+    }
+}
+
+// ---- CADDY <-> TOWER LINK BRACKET ------------------------------------------
+// Hangs on the tower's low rear peg (keyhole) and C-clips the caddy front wall,
+// locking the desk-sited caddy to the tower at a fixed gap.
+link_gap = 33;                 // tower rear face -> caddy front face
+link_z   = 42;                 // working height (~caddy wall-top)
+cad_wtop = floor_t + (brick[1]-8);   // caddy front-wall top height (=45)
+module link_bracket(){
+    bw=18; legt=2.5; cl=0.4; t=3;
+    color("DimGray") union(){
+        translate([-bw/2, -link_gap, link_z]) cube([bw, link_gap, 5]);   // spanning bar
+        // tower-end keyhole tab (drops onto the low peg)
+        difference(){
+            translate([-bw/2, -1, link_z-16]) cube([bw, 4, 21]);
+            translate([0,-2.2, link_z+1]) rotate([90,0,0]) cylinder(h=10,d=10,center=true,$fn=30); // head hole
+            translate([-2.5,-2.2, link_z-9]) cube([5,10,11]);            // shaft slot below
+        }
+        // caddy-end C-clip straddling the caddy front wall
+        translate([-bw/2, -link_gap-t-legt-cl, cad_wtop-2]) cube([bw, t+2*(legt+cl), 6]); // bridge
+        translate([-bw/2, -link_gap+cl,          cad_wtop-16]) cube([bw, legt, 18]);      // outer leg
+        translate([-bw/2, -link_gap-t-cl-legt,   cad_wtop-16]) cube([bw, legt, 18]);      // inner leg
     }
 }
 
@@ -783,6 +808,8 @@ module full_system(){
     // cable spine bridging tower rear to the caddy
     color("Salmon")
         translate([0, -ac_d/2 - 45, 0]) cable_spine();
+    // link bracket locking the caddy to the tower
+    translate([0, -ac_d/2, 0]) link_bracket();
     // ghosts: bricks in the caddy + hub in its tray (so the system reads)
     bs = brick[2]+2*clear; bw = brick_count*bs+(brick_count-1)*div;
     for(i=[0:brick_count-1]) translate([-bw/2+bs/2+i*(bs+div), -ac_d/2-95, floor_t+brick[1]/2-4])
@@ -876,6 +903,7 @@ else if (part == "ac_tower")      ac_tower(0);
 else if (part == "ac_tower_x")    ac_tower(40);
 else if (part == "print_plates")  print_plates();
 else if (part == "full_system")   full_system();
+else if (part == "link_bracket")  link_bracket();
 else if (part == "drive_lid_fan") drive_lid_fan();
 else if (part == "brick_caddy")   brick_caddy();
 else if (part == "layout")        layout();

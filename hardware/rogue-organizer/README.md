@@ -47,6 +47,7 @@ A space-saving alternative to the side-by-side layout: the mini PC stacks
 | Fan mid-deck | `stl/ac_deck.stl` | 153 × 195 × 32 | 80/92 mm fan + spoke guard; standoffs form the exhaust plenum |
 | PC cradle | `stl/ac_cradle.stl` | 141 × 128 × 29 | vented floor, register holes, pierced front |
 | Cloud-lift cap | `stl/ac_cap.stl` | 149 × 136 × 28 | overhanging top, vented, friction skirt |
+| Caddy link bracket | `stl/link_bracket.stl` | 18 × 40 × 21 | keyhole hangs on tower's low peg, C-clip grips caddy front wall (print on its back) |
 
 Render the stack with `part="ac_tower"` (assembled) or `"ac_tower_x"` (exploded).
 
@@ -54,7 +55,10 @@ Render the stack with `part="ac_tower"` (assembled) or `"ac_tower_x"` (exploded)
 tray's keyhole hangs on, so the hub mounts directly to the tower. The power-brick
 caddy stays desk-sited beside/behind the tower (an open-top tray can't hang
 vertically without the bricks sliding out) and is tied into the run by the cable
-spine. Render the whole assembly with `part="full_system"`.
+spine. A **`link_bracket`** mechanically locks the caddy to the tower: it hangs on
+a second (low) hook peg on the tower rear and C-clips over the caddy's front wall,
+fixing the gap so the caddy can't drift. Render the whole assembly with
+`part="full_system"`.
 
 **Cooling:** the mid-deck fan pulls hot air **up** out of the drive bays and the
 corner standoffs hold the PC cradle ~16 mm above the deck, so that air vents
