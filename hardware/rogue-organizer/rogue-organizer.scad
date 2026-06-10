@@ -761,6 +761,31 @@ module ac_tower(exploded=0){
     translate([0,0,z_cap    + e*2.6]) ac_cap();
 }
 
+// ---- PRINT PLATES (each part flat on its own 220x220 bed) ------------------
+bed_sz = 220;
+module bed_plate(){
+    color([0.88,0.88,0.90]) translate([0,0,-0.6]) cube([bed_sz, bed_sz, 1], center=true);
+    color([0.55,0.55,0.58]) linear_extrude(1.3)
+        difference(){ square([bed_sz,bed_sz],center=true); square([bed_sz-8,bed_sz-8],center=true); }
+}
+module print_plates(){
+    g = 250;
+    // each part is rotated into a sensible flat-on-bed print orientation
+    translate([-g/2,  g/2, 0]){ bed_plate(); ac_drive(); }                 // floor-down
+    translate([ g/2,  g/2, 0]){ bed_plate(); rotate([180,0,0]) translate([0,0,-(deck_t+plenum+6)]) ac_deck(); } // flange-up, standoffs down
+    translate([-g/2, -g/2, 0]){ bed_plate(); ac_cradle(); }                // floor-down
+    translate([ g/2, -g/2, 0]){ bed_plate(); rotate([180,0,0]) translate([0,0,-7]) ac_cap(); }   // top-down
+    color([0.1,0.1,0.1]){
+        label("ac_drive  159 x 201", -g/2,  g/2+128, 13);
+        label("ac_deck  153 x 195",   g/2,  g/2+128, 13);
+        label("ac_cradle  141 x 128",-g/2, -g/2-128, 13);
+        label("ac_cap  149 x 136",    g/2, -g/2-128, 13);
+        translate([0, g/2+185, 0.2]) linear_extrude(1)
+            text("Arts & Crafts tower - print plates (each fits a 220 x 220 bed, no supports)",
+                 size=15, halign="center");
+    }
+}
+
 // =============================================================================
 //  MOCKUP  --  assembled organizer populated with translucent hardware ghosts
 //             (PREVIEW ONLY). show_lid toggles the box lid.
@@ -819,6 +844,7 @@ else if (part == "ac_cradle")     ac_cradle();
 else if (part == "ac_cap")        ac_cap();
 else if (part == "ac_tower")      ac_tower(0);
 else if (part == "ac_tower_x")    ac_tower(40);
+else if (part == "print_plates")  print_plates();
 else if (part == "drive_lid_fan") drive_lid_fan();
 else if (part == "brick_caddy")   brick_caddy();
 else if (part == "layout")        layout();
