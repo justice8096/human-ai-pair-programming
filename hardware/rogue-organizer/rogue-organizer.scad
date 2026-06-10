@@ -487,6 +487,133 @@ module drawing(){
 }
 
 // =============================================================================
+//  STYLED STACKED TOWER  (concept renders -- mini PC stacked ON TOP of the
+//  drive box to shrink the desk footprint. Two aesthetic variations.)
+//  These are visual concepts, not yet final printable parts.
+// =============================================================================
+tw_w  = ext_w;
+tw_d  = ext_d;
+h_low = ext_h;                              // drive section (4 vertical bays)
+h_up  = floor_t + foot_h + beelink[2] + 2*clear;   // mini PC section on top
+up_in = 8;                                  // upper section inset per side
+
+module box_shell(w,d,h,wt=3){
+    difference(){
+        rbox([w,d,h], r=3);
+        translate([0,0,wt]) rbox([w-2*wt, d-2*wt, h], r=2);
+    }
+}
+module tower_core(){
+    box_shell(tw_w, tw_d, h_low);
+    translate([0,0,h_low]) box_shell(tw_w-2*up_in, tw_d-2*up_in, h_up);
+}
+
+// ---- STEAMPUNK -------------------------------------------------------------
+ph_d = 22;                                  // porthole diameter
+ph_pos = [[-44,h_low*0.42],[0,h_low*0.42],[44,h_low*0.42],
+          [-44,h_low*0.72],[0,h_low*0.72],[44,h_low*0.72]];
+
+module sp_rivets(p1,p2,n,d=3.4){
+    for(i=[0:n-1]){
+        t=i/(n-1);
+        translate([p1[0]+(p2[0]-p1[0])*t, p1[1]+(p2[1]-p1[1])*t, p1[2]+(p2[2]-p1[2])*t])
+            sphere(d=d,$fn=14);
+    }
+}
+module tower_steampunk(){
+    color([0.74,0.56,0.24]){
+        difference(){
+            tower_core();
+            // front portholes
+            for(p=ph_pos) translate([p[0], tw_d/2, p[1]]) rotate([90,0,0]) cylinder(h=20,d=ph_d,center=true);
+            // side louver slots
+            vents_X(+tw_w/2, tw_d, h_low*0.25, h_low*0.85, bar=4, gap=7);
+            vents_X(-tw_w/2, tw_d, h_low*0.25, h_low*0.85, bar=4, gap=7);
+        }
+        // porthole rims (proud of the surface)
+        for(p=ph_pos) translate([p[0], tw_d/2+0.5, p[1]]) rotate([90,0,0])
+            difference(){ cylinder(h=4,d=ph_d+7,center=true,$fn=36); cylinder(h=6,d=ph_d,center=true,$fn=36); }
+        // riveted vertical corner straps
+        for(sx=[-1,1], sy=[-1,1]){
+            translate([sx*(tw_w/2-2), sy*(tw_d/2-2), h_low/2])
+                cube([7,7,h_low-8], center=true);
+            sp_rivets([sx*(tw_w/2-2), sy*(tw_d/2+1.5), 12],
+                      [sx*(tw_w/2-2), sy*(tw_d/2+1.5), h_low-12], 6);
+        }
+        // riveted waist band around the drive section
+        difference(){
+            translate([0,0,h_low*0.57]) rbox_band(tw_w+3, tw_d+3, 10);
+            translate([0,0,h_low*0.57]) rbox_band(tw_w-1, tw_d-1, 12);
+        }
+    }
+    // brass-pipe + gauge fittings on top
+    top_z = h_low + h_up;
+    color([0.80,0.62,0.28]){
+        translate([0,0,top_z]) cylinder(h=6, d=34, $fn=40);        // flange
+        translate([0,0,top_z]) cylinder(h=26, d=18, $fn=40);       // riser pipe
+        translate([0,0,top_z+26]) rotate([0,90,0]) cylinder(h=34,d=14,center=true,$fn=32); // cross pipe
+        for(sx=[-1,1]) translate([sx*17, 0, top_z+26]) sphere(d=16,$fn=20);                 // pipe caps
+        for(sy=[-1,1]) translate([(tw_w/2-up_in-14), sy*(tw_d/2-up_in-14), top_z])
+            { cylinder(h=22,d=11,$fn=24); translate([0,0,22]) cylinder(h=4,d=15,$fn=24); }  // small stacks
+    }
+    color([0.85,0.80,0.55]) translate([ -tw_w/2+up_in+20, tw_d/2-up_in-4, top_z+10])
+        rotate([90,0,0]) cylinder(h=4,d=24,$fn=36);   // gauge dial
+    // domed feet
+    color([0.45,0.32,0.12]) for(sx=[-1,1],sy=[-1,1])
+        translate([sx*(tw_w/2-12), sy*(tw_d/2-12), 0]) scale([1,1,0.5]) sphere(d=20,$fn=20);
+}
+module rbox_band(w,d,h){ rbox([w,d,h], r=3); }
+
+// ---- ARTS & CRAFTS (Craftsman / Mission) -----------------------------------
+module ac_pierce(){
+    // centered Mission-style pierced panel on the front (+Y) lower face
+    for(x=[-26,0,26]){
+        // tall slot
+        translate([x, tw_d/2, h_low*0.42]) rotate([90,0,0])
+            linear_extrude(20,center=true) offset(3) offset(-3) square([8,46],center=true);
+        // square above
+        translate([x, tw_d/2, h_low*0.72]) rotate([90,0,0])
+            linear_extrude(20,center=true) square([11,11],center=true);
+    }
+}
+module cloud_lift(w, t, depth){
+    // stepped "cloud lift" bar: a beam with two raised steps (Greene & Greene)
+    linear_extrude(depth) difference(){
+        square([w, t], center=true);
+        for(s=[-1,1]) translate([s*w*0.28, -t/2]) square([w*0.18, t*0.45], center=true);
+    }
+}
+module tower_artscraft(){
+    color([0.52,0.35,0.17]){
+        difference(){
+            tower_core();
+            ac_pierce();
+            // simple slot vents on the sides
+            vents_X(+tw_w/2, tw_d, h_low*0.25, h_low*0.85, bar=6, gap=12);
+            vents_X(-tw_w/2, tw_d, h_low*0.25, h_low*0.85, bar=6, gap=12);
+        }
+        // exposed square "through-tenon" pegs at the corners
+        for(sx=[-1,1], sy=[-1,1], z=[h_low*0.2, h_low*0.85])
+            translate([sx*(tw_w/2), sy*(tw_d/2), z]) cube([6,6,12], center=true);
+    }
+    top_z = h_low + h_up;
+    // overhanging cap with a cloud-lift front rail
+    color([0.42,0.27,0.12]){
+        translate([0,0,top_z]) rbox([tw_w+14, tw_d+14, 7], r=4);
+        translate([0, (tw_d+14)/2-3, top_z+7]) cloud_lift(tw_w*0.7, 10, 14);
+    }
+    // plinth base with cloud-lift apron
+    color([0.42,0.27,0.12]){
+        difference(){
+            translate([0,0,-8]) rbox([tw_w+14, tw_d+14, 8], r=4);
+            translate([0, (tw_d+14)/2-2, -8]) rotate([90,0,0]) cloud_lift(tw_w*0.8, 9, 8);
+        }
+        for(sx=[-1,1],sy=[-1,1])   // square block feet
+            translate([sx*(tw_w/2-2), sy*(tw_d/2-2), -14]) cube([14,14,6],center=true);
+    }
+}
+
+// =============================================================================
 //  MOCKUP  --  assembled organizer populated with translucent hardware ghosts
 //             (PREVIEW ONLY). show_lid toggles the box lid.
 // =============================================================================
@@ -536,6 +663,8 @@ module mockup(show_lid=true){
 if      (part == "mockup")        mockup(true);
 else if (part == "mockup_open")   mockup(false);
 else if (part == "drawing")       drawing();
+else if (part == "tower_steampunk") tower_steampunk();
+else if (part == "tower_artscraft") tower_artscraft();
 else if (part == "drive_lid_fan") drive_lid_fan();
 else if (part == "brick_caddy")   brick_caddy();
 else if (part == "layout")        layout();

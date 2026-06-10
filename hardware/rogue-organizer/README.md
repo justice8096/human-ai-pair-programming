@@ -109,6 +109,24 @@ xvfb-run -a openscad -o img/drive_box.png -D 'part="drive_box"' \
 Valid `part` values: `layout` (preview-only), `drive_box`, `drive_lid`,
 `minipc_cradle`, `hub_tray`, `cable_spine`, `cable_clip`.
 
+## Styled stacked variations (concept)
+
+To shrink the desk footprint, the mini PC can stack **on top of** the drive box
+as a tower (footprint drops from ~294 mm wide to just the box's ~162 × 195 mm).
+Two aesthetic concepts are included as renders (`part="tower_steampunk"` /
+`"tower_artscraft"`):
+
+- **Steampunk** (`img/tower_steampunk.png`) — brass tone, riveted porthole vents,
+  riveted corner straps, side louvers, and pipe/valve/pressure-gauge top fittings.
+- **Arts & Crafts** (`img/tower_artscraft.png`) — warm wood tone, Mission-style
+  pierced rectilinear vents, exposed square through-tenon corner pegs, an
+  overhanging cloud-lift top cap, and a plinth base with block feet.
+
+These are **visual concepts, not yet final printable parts** — the decorative
+geometry renders but hasn't been re-engineered into vented, manifold, joint-ready
+modules. Pick a direction and it gets refined into print-ready parts (and the
+heat/joint considerations below still apply, more so when stacked).
+
 ## Cross-vet — known weak points
 
 In the spirit of this repo, here are the design's honest counter-arguments:
