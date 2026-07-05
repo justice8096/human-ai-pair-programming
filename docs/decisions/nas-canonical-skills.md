@@ -81,24 +81,35 @@ Migration + ongoing sync is handled by
 [`scripts/sync-skills-to-nas.ps1`](../../scripts/sync-skills-to-nas.ps1)
 (PowerShell / Windows). It:
 
-- discovers every git repo under the configured `D:` root,
-- clones any not yet on the NAS, and `git pull`s the rest,
-- keeps full local checkouts of the repos listed in `$CoreRepos`,
+- reads the explicit repo list from
+  [`scripts/skill-repos.manifest`](../../scripts/skill-repos.manifest)
+  (resolved under `-LocalBase`, default `D:\`) — an explicit manifest, not
+  discovery, so the vault and other git dirs under `D:\` are never swept in,
+- clones any repo not yet on the NAS, and `git pull --ff-only`s the rest,
+- keeps full local checkouts of the core repos (`+`-marked in the manifest,
+  or passed via `-CoreRepos`),
 - reports (and, only with `-Prune`, removes) local working copies of
-  non-core repos.
+  non-core repos,
+- warns and skips any manifest name not found on disk rather than failing.
 
 Defaults to **dry-run**; pass `-Execute` to act. Never prunes without an
 explicit `-Prune` flag.
 
 ## Open items
 
-Two inputs are needed before this can run for real:
-
-1. **`D:` root** — the parent folder the skill repos sit under
-   (e.g. `D:\skills\`), so discovery has a starting point.
-2. **The load-bearing core** — which repos/skills MUST stay fully local
-   to survive a NAS outage. This is the single human judgement call the
-   design hinges on.
+1. ~~**`D:` root / inventory**~~ — resolved. The repos sit directly under
+   `D:\` (not a common parent), enumerated in
+   [`scripts/skill-repos.manifest`](../../scripts/skill-repos.manifest)
+   (22 repos as of 2026-07-05). `retirement` is a distinct skills-bearing
+   repo, not the origin `retirement-dashboard-angular`.
+2. **The load-bearing core** — which repos MUST stay fully local to survive
+   a NAS outage. Still open; the single human judgement call the design
+   hinges on. Mark them with `+` in the manifest (or pass `-CoreRepos`).
+   Until set, `-Prune` removes nothing — every local copy is kept.
+3. **Origin anchor** — whether the NAS clones should point their `origin`
+   at a GitHub/remote URL rather than the local `D:\<repo>` path (see
+   mitigation #1). The current script clones from the local path; if these
+   repos have remotes, anchoring to them is cleaner.
 
 ## Consequences
 
