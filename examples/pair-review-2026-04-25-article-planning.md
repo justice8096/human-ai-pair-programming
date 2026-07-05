@@ -8,7 +8,7 @@ docs (`docs/audit-artifacts.md`) and templates
 (`templates/pair-review-template.md`), and this very example file.
 
 For the full session arc, see the corresponding session note:
-`D:/SecondBrainData/SoftwarePractices/Projects/HumanAIPairProgramming-Session-2026-04-25.md`.
+`//192.158.68.77/disk1/SecondBrainData/SoftwarePractices/Projects/HumanAIPairProgramming-Session-2026-04-25.md`.
 
 ## Caveat — reconstructed post-hoc
 
@@ -113,7 +113,7 @@ production code touched).
 **Linked PRs / follow-up items:**
 - Plan file: `C:/Users/justi/.claude/plans/jolly-cooking-pinwheel.md`
 - Session note:
-  `D:/SecondBrainData/SoftwarePractices/Projects/HumanAIPairProgramming-Session-2026-04-25.md`
+  `//192.158.68.77/disk1/SecondBrainData/SoftwarePractices/Projects/HumanAIPairProgramming-Session-2026-04-25.md`
 - TODO.md item #2 (publication-venue research given attribution
   honesty considerations)
 - TODO.md item #3 (codify per-project audit-artifacts framework)

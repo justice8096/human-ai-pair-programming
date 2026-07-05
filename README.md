@@ -63,11 +63,11 @@ and the publication-venue research for the article.
 ## Key references
 
 - Source vault note (living document):
-  `D:\SecondBrainData\SoftwarePractices\AI-Human-Pair-Programming-Methodology.md`
+  `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Human-Pair-Programming-Methodology.md`
 - Origin sessions: `retirement-dashboard-angular` PRs #56 through #61
 - Adjacent reading:
-  `D:\SecondBrainData\SoftwarePractices\AI-Regulations-*.md`,
-  `D:\SecondBrainData\SoftwarePractices\AI-Compliance-Evidence-Matrix-Poster.md`
+  `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Regulations-*.md`,
+  `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Compliance-Evidence-Matrix-Poster.md`
 
 ## License
 
