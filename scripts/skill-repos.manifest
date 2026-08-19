@@ -1,0 +1,34 @@
+# Inventory of D: repos to mirror to the NAS.
+#
+# One repo folder name per line, resolved under -LocalBase (default D:\).
+# Blank lines and #-comments are ignored; inline text after # is stripped.
+#
+# Prefix a line with '+' to mark it load-bearing core (kept fully local as the
+# offline fallback). Everything else becomes NAS-only. No core is marked yet —
+# fill these in before running with -Prune, or the run keeps every local copy.
+#
+# The sync script warns and skips any name it can't find on disk rather than
+# failing the whole run, so a stray typo is non-fatal.
+
+accessibility-audit-skill
+claude-obsidian-sync
+claude-skills
+comfyui-api-client
+comfyui-dependency-scanner
+compliance
+dualcoding-pipeline
+dyscalculia-support-skill
+dyslexia-support-skill
+financial-calc
+human-ai-pair-programming
+keyframe-movie-maker
+linkedin-connector-plugin
+llm-agent-orchestrator
+llm-modal-registry
+multi-format-build-skill
+n8n-workflow-path-migrator
+n8n-workflow-tools
+obsidian-vault-organizer
+open-design
+retirement
+zero-dep-wizard

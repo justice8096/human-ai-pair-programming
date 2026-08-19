@@ -5,11 +5,11 @@ out items as they ship rather than deleting, so the trail is visible.
 
 ## Open
 
-### 1. Sanitize and inline `D:\SecondBrainData\SoftwarePractices\AI-*` sources
+### 1. Sanitize and inline `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-*` sources
 
 **Why:** The `docs/` files (especially
 [`docs/regulatory-mapping.md`](docs/regulatory-mapping.md)) reference
-vault paths under `D:\SecondBrainData\SoftwarePractices\AI-*.md` that
+vault paths under `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-*.md` that
 only resolve on the original author's machine. For outside readers
 (and for this repo to stand on its own as a CC0 artifact), the
 substantive content of those notes should be sanitized — strip any
@@ -27,7 +27,7 @@ repo, either as additional `docs/` files or as appendix sections.
   (`type:`, `tags:`, `related: [[wiki-links]]`), convert wiki-links
   to relative repo paths.
 - Update `docs/regulatory-mapping.md` to link to the new in-repo
-  files instead of `D:\SecondBrainData\...` paths. Same for any
+  files instead of `\\192.158.68.77\disk1\SecondBrainData\...` paths. Same for any
   other doc that currently references vault paths.
 
 **Defer until:** the planning / scaffolding work on the repo settles

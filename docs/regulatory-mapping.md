@@ -91,17 +91,17 @@ may not be reachable for adopters; they are listed here as the
 authoritative source of further detail rather than as drop-in
 dependencies:
 
-- `D:\SecondBrainData\SoftwarePractices\AI-Regulations-Global-Overview.md`
+- `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Regulations-Global-Overview.md`
   — index covering 11 jurisdictions, with the EU AI Act / South Korea /
   US state law timelines through 2026
-- `D:\SecondBrainData\SoftwarePractices\AI-Regulations-EU.md` —
+- `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Regulations-EU.md` —
   EU AI Act, phased applicability through Aug 2026
-- `D:\SecondBrainData\SoftwarePractices\AI-Regulations-UnitedStates.md`
+- `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Regulations-UnitedStates.md`
   — patchwork of state laws, no federal omnibus
-- `D:\SecondBrainData\SoftwarePractices\AI-Regulations-{UK,Canada,China,Japan-SouthKorea,India-Singapore-ASEAN,Australia,NewZealand,Mexico-LatinAmerica,Africa}.md`
+- `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Regulations-{UK,Canada,China,Japan-SouthKorea,India-Singapore-ASEAN,Australia,NewZealand,Mexico-LatinAmerica,Africa}.md`
   — region-by-region detail
-- `D:\SecondBrainData\SoftwarePractices\AI-Compliance-Evidence-Matrix-Poster.md`
+- `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Compliance-Evidence-Matrix-Poster.md`
   — visual taxonomy of 16 jurisdictions × 24 evidence categories;
   feeds [`evidence-checklist.md`](evidence-checklist.md)
-- `D:\SecondBrainData\SoftwarePractices\AI-Compliance-Open-Source-Applicability.md`
+- `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Compliance-Open-Source-Applicability.md`
   — applicability of these frameworks to open-source projects specifically

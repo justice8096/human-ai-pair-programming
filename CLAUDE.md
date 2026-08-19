@@ -30,11 +30,11 @@ here should embody what's documented in `METHODOLOGY.md`. Specifically:
 ## Cross-references
 
 - Living methodology note (the one place to keep substantive thinking):
-  `D:\SecondBrainData\SoftwarePractices\AI-Human-Pair-Programming-Methodology.md`
+  `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Human-Pair-Programming-Methodology.md`
 - Adjacent regulatory references:
-  `D:\SecondBrainData\SoftwarePractices\AI-Regulations-*.md`,
-  `D:\SecondBrainData\SoftwarePractices\AI-Compliance-Evidence-Matrix-Poster.md`
-- Origin sessions: `D:\retirement-dashboard-angular` PRs #56–#61
+  `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Regulations-*.md`,
+  `\\192.158.68.77\disk1\SecondBrainData\SoftwarePractices\AI-Compliance-Evidence-Matrix-Poster.md`
+- Origin sessions: `\\192.158.68.77\disk1\retirement-dashboard-angular` PRs #56–#61
 
 ## Open questions (carried forward from origin session)
 
